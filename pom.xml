@@ -34,5 +34,12 @@
           <artifactId>lombok</artifactId>
           <version>1.18.30</version>
       </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
+      <dependency>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.14</version>
+      </dependency>
   </dependencies>
 </project>
