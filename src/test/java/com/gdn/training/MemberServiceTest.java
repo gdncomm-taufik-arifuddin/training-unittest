@@ -11,8 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +27,7 @@ class MemberServiceTest {
   private MemberRepository memberRepository;
 
   @Test
-  public void memberNotFound() {
+  public void successSuspendMember() {
     when(memberRepository.getMember("member-id")).thenReturn(Member.builder()
         .id("member-id")
         .name("name")
@@ -46,6 +45,24 @@ class MemberServiceTest {
     assertEquals("name", member.getName());
     assertEquals("member-id", member.getId());
     assertEquals("name@mail.com", member.getEmail());
+  }
+
+  @Test
+  public void memberNotFound() {
+    when(memberRepository.getMember("member-id")).thenReturn(null);
+    assertThrows(RuntimeException.class, () -> memberService.suspendMember("member-id"));
+  }
+
+  @Test
+  public void memberAlreadySuspended() {
+    when(memberRepository.getMember("member-id")).thenReturn(Member.builder()
+        .id("member-id")
+        .name("name")
+        .email("name@mail.com")
+        .suspended(true)
+        .build());
+
+    assertThrows(RuntimeException.class, () -> memberService.suspendMember("member-id"));
   }
 
   @AfterEach

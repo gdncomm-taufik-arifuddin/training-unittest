@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringHelperTest {
   @Test
-  public void successConvert() {
+  public void successConvertToUpperCase() {
     List<String> strings = new ArrayList<>();
     strings.add("aa");
     strings.add("bb");
