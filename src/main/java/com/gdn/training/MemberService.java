@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MemberService {
-
   private MemberRepository memberRepository;
 
   public void suspendMember(String id){
@@ -22,5 +21,4 @@ public class MemberService {
     member.setSuspended(true);
     memberRepository.save(member);
   }
-
 }
