@@ -1,0 +1,52 @@
+package com.gdn.training;
+
+import com.gdn.training.dummy.entity.Member;
+import com.gdn.training.dummy.repository.MemberRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class MemberServiceTest {
+  @InjectMocks
+  private MemberService memberService;
+
+  @Mock
+  private MemberRepository memberRepository;
+
+  @Test
+  public void memberNotFound() {
+    when(memberRepository.getMember("member-id")).thenReturn(Member.builder()
+        .id("member-id")
+        .name("name")
+        .email("name@mail.com")
+        .suspended(false)
+        .build());
+
+    memberService.suspendMember("member-id");
+
+    verify(memberRepository).getMember("member-id");
+
+    ArgumentCaptor<Member> memberArgumentCaptor = ArgumentCaptor.forClass(Member.class);
+    verify(memberRepository).save(memberArgumentCaptor.capture());
+    Member member = memberArgumentCaptor.getValue();
+    assertTrue(member.isSuspended());
+    assertEquals("member-id", member.getId());
+    assertEquals("name", member.getName());
+    assertEquals("name@mail.com", member.getEmail());
+  }
+
+  @AfterEach
+  public void tearDown() {
+    verifyNoMoreInteractions(memberRepository);
+  }
+}
