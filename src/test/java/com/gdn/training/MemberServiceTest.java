@@ -3,6 +3,7 @@ package com.gdn.training;
 import com.gdn.training.dummy.entity.Member;
 import com.gdn.training.dummy.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -13,49 +14,45 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-@ExtendWith({MockitoExtension.class})
+@ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
-    @InjectMocks
-    private MemberService memberService;
-    @Mock
-    private MemberRepository memberRepository;
-    @Captor
-    private ArgumentCaptor<Member> memberArgumentCaptor;
+  @InjectMocks
+  private MemberService memberService;
 
-    @Test
-    public void memberNotFound() {
-        when(memberRepository.getMember("member-id"))
-                .thenReturn(Member.builder()
-                        .id("member-id")
-                        .name("name")
-                        .suspended(false)
-                        .build());
-//        Assertions.assertThrows(RuntimeException.class, () -> memberService.suspendMember("member-id"));
+  @Captor
+  private ArgumentCaptor<Member> memberArgumentCaptor;
 
-        memberService.suspendMember("member-id");
+  @Mock
+  private MemberRepository memberRepository;
 
-        verify(memberRepository).getMember("member-id");
+  @Test
+  public void memberNotFound(){
+    when(memberRepository.getMember("member-id"))
+        .thenReturn(Member.builder()
+            .id("member-id")
+            .name("name")
+            .suspended(false)
+            .build());
 
-//        ArgumentCaptor<Member> memberArgumentCaptor = ArgumentCaptor.forClass(Member.class);
+    memberService.suspendMember("member-id");
 
-//        verify(memberRepository).save(any(Member.class));
-        verify(memberRepository).save(memberArgumentCaptor.capture());
-        Member member = memberArgumentCaptor.getValue();
-        assertTrue(member.isSuspended());
-        assertEquals("name", member.getName());
-        assertEquals("member-id", member.getId());
+    verify(memberRepository).getMember("member-id");
 
+    verify(memberRepository).save(memberArgumentCaptor.capture());
+    Member member = memberArgumentCaptor.getValue();
+    assertTrue(member.isSuspended());
+    assertEquals("name", member.getName());
+    assertEquals("member-id", member.getId());
+  }
 
-//        verify(memberService).suspendMember("member-id2");
-    }
-
-    @AfterEach
-    public void tearDown() {
-        verifyNoMoreInteractions(memberRepository);
-    }
-
-
+  @AfterEach
+  public void tearDown(){
+    verifyNoMoreInteractions(memberRepository);
+  }
 }

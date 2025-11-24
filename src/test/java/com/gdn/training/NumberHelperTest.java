@@ -20,5 +20,4 @@ class NumberHelperTest {
         assertFalse(NumberHelper.isEven(3));
         assertTrue(NumberHelper.isEven(2));
     }
-
 }
