@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,11 +15,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
+
   @InjectMocks
   private MemberService memberService;
+
+  @Captor
+  private ArgumentCaptor<Member> memberArgumentCaptor;
 
   @Mock
   private MemberRepository memberRepository;
@@ -36,12 +45,11 @@ class MemberServiceTest {
 
     verify(memberRepository).getMember("member-id");
 
-    ArgumentCaptor<Member> memberArgumentCaptor = ArgumentCaptor.forClass(Member.class);
     verify(memberRepository).save(memberArgumentCaptor.capture());
     Member member = memberArgumentCaptor.getValue();
     assertTrue(member.isSuspended());
-    assertEquals("member-id", member.getId());
     assertEquals("name", member.getName());
+    assertEquals("member-id", member.getId());
     assertEquals("name@mail.com", member.getEmail());
   }
 
