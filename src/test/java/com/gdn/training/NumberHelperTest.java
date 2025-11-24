@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Number Helper Test")
 class NumberHelperTest {
+
   @Test
   @DisplayName("is odd test")
   public void isOddTest() {
