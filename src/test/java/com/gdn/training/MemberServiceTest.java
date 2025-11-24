@@ -1,0 +1,49 @@
+package com.gdn.training;
+
+import com.gdn.training.dummy.entity.Member;
+import com.gdn.training.dummy.repository.MemberRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class MemberServiceTest {
+
+    @InjectMocks
+    MemberService memberService;
+
+    @Captor
+    ArgumentCaptor<Member> memberArgumentCaptor;
+
+    @Mock
+    MemberRepository memberRepository;
+
+    @Test
+    void suspendMember() {
+        when(memberRepository.getMember("member-id")).thenReturn(Member.builder()
+                .id("member-id")
+                .name("name")
+                .email("test@email.com")
+                .suspended(false).build());
+        memberService.suspendMember("member-id");
+        verify(memberRepository).getMember("member-id");
+        verify(memberRepository).save(memberArgumentCaptor.capture());
+        Member member = memberArgumentCaptor.getValue();
+        assertTrue(member.isSuspended());
+
+        when(memberRepository.getMember("null")).thenReturn(null);
+        assertThrows(RuntimeException.class, ()->memberService.suspendMember("null"));
+        Member suspendedMember = new Member();
+        suspendedMember.setSuspended(true);
+        when(memberRepository.getMember("suspended")).thenReturn(suspendedMember);
+        assertThrows(RuntimeException.class, ()->memberService.suspendMember("suspended"));
+    }
+}

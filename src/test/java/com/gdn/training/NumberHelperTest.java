@@ -10,7 +10,15 @@ class NumberHelperTest {
   @Test
   @DisplayName("is odd test")
   public void isOddTest() {
-    assertFalse(NumberHelper.isOdd(2));
-    assertTrue(NumberHelper.isOdd(3));
+      assertFalse(NumberHelper.isOdd(2));
+      assertTrue(NumberHelper.isOdd(3));
   }
+
+  @Test
+  @DisplayName("is odd test")
+  public void isEvenTest(){
+      assertTrue(NumberHelper.isEven(2));
+      assertFalse(NumberHelper.isEven(3));
+  }
+
 }
