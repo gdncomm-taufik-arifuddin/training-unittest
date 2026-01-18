@@ -10,7 +10,7 @@ public class MemberService {
   private MemberRepository memberRepository;
 
   public void suspendMember(String id){
-    Member member = memberRepository.getMember(id);
+    Member member = getMemberById(id);
     if(member == null){
       throw new RuntimeException("Member not found");
     }
@@ -21,6 +21,15 @@ public class MemberService {
 
     member.setSuspended(true);
     memberRepository.save(member);
+  }
+
+  private Member getMemberById(String id) {
+    return memberRepository.getMember(id);
+  }
+
+  public boolean isSuspendedMember(String id){
+    Member member = getMemberById(id);
+    return member != null && member.isSuspended();
   }
 
 }
