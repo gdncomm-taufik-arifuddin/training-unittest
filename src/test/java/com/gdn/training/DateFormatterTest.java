@@ -18,4 +18,19 @@ class DateFormatterTest {
         Date date = cal.getTime();
         assertEquals("2025-11", DateFormatter.getFormattedYearMonth(date));
     }
+
+    @Test
+    @DisplayName("success to format date")
+    public void successFormatDate() {
+        //1768795712000 19 jan
+        assertEquals("2026-01", DateFormatter.getFormattedYearMonth(new Date(1768795712000l)));
+    }
+
+    @Test
+    @DisplayName("get message when null")
+    public void nullFormattedDateTest() {
+        IllegalArgumentException illegalArgumentException =
+        assertThrows(IllegalArgumentException.class, () -> DateFormatter.getFormattedYearMonth(null));
+        assertEquals("date is null", illegalArgumentException.getMessage());
+    }
 }
