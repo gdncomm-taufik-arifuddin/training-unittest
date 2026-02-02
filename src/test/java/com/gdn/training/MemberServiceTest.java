@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -51,6 +52,41 @@ class MemberServiceTest {
     assertEquals("member-id", member.getId());
   }
 
+  @Test
+  public void testNotFoundMember(){
+    when(memberRepository.getMember("123")).thenReturn(null);
+
+    assertThrows(RuntimeException.class, () -> memberService.suspendMember("123"));
+  }
+
+  @Test
+  public void testSuspendMember(){
+    when(memberRepository.getMember("123")).thenReturn(
+        Member.builder()
+            .id("123")
+            .email("test@gmail.com")
+            .suspended(false).build());
+
+    memberService.suspendMember("123");
+    verify(memberRepository).getMember("123");
+    ArgumentCaptor<Member> captor = ArgumentCaptor.forClass(Member.class);
+    verify(memberRepository).save(captor.capture());
+    Member member = captor.getValue();
+    assertTrue(member.isSuspended());
+    assertEquals("test@gmail.com", member.getEmail());
+    assertEquals("123", member.getId());
+    //    cara manual:
+    //    verify(memberRepository).save(Member.builder().id("123").email("test@gmail.com").suspended(true).build());
+  }
+
+  @Test
+  public void testMemberAlreadySuspended(){
+    when(memberRepository.getMember("123"))
+        .thenReturn(Member.builder().id("123")
+            .email("test@gmail.com")
+            .suspended(true).build());
+    assertThrows(RuntimeException.class, () -> memberService.suspendMember("123"));
+  }
   @AfterEach
   public void tearDown(){
     verifyNoMoreInteractions(memberRepository);
