@@ -3,7 +3,8 @@ package com.gdn.training;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Number Helper Test")
 class NumberHelperTest {
@@ -13,5 +14,12 @@ class NumberHelperTest {
   public void isOddTest() {
     assertFalse(NumberHelper.isOdd(2));
     assertTrue(NumberHelper.isOdd(3));
+  }
+
+  @Test
+  @DisplayName("is even test")
+  public void isEvenTest() {
+    assertFalse(NumberHelper.isEven(3));
+    assertTrue(NumberHelper.isEven(4));
   }
 }
