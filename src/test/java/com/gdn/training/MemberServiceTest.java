@@ -2,57 +2,73 @@ package com.gdn.training;
 
 import com.gdn.training.dummy.entity.Member;
 import com.gdn.training.dummy.repository.MemberRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
-  @InjectMocks
-  private MemberService memberService;
+    @InjectMocks
+    private MemberService memberService;
 
-  @Captor
-  private ArgumentCaptor<Member> memberArgumentCaptor;
+    @Mock
+    private MemberRepository memberRepository;
 
-  @Mock
-  private MemberRepository memberRepository;
+    @Test
+    @DisplayName("Member Not Found Test")
+    void memberNotFoundTest(){
+        when(memberRepository.getMember("423")).thenReturn(null);
 
-  @Test
-  public void memberNotFound(){
-    when(memberRepository.getMember("member-id"))
-        .thenReturn(Member.builder()
-            .id("member-id")
-            .name("name")
-            .suspended(false)
-            .build());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> memberService.suspendMember("423"));
+        assertEquals("Member not found",exception.getMessage());
+    }
 
-    memberService.suspendMember("member-id");
+    @Test
+    @DisplayName("Member Already Suspended Test")
+    void memberAlreadySuspendedTest(){
+        Member member = new Member();
+        member.setSuspended(true);
 
-    verify(memberRepository).getMember("member-id");
+        when(memberRepository.getMember("423")).thenReturn(member);
 
-    verify(memberRepository).save(memberArgumentCaptor.capture());
-    Member member = memberArgumentCaptor.getValue();
-    assertTrue(member.isSuspended());
-    assertEquals("name", member.getName());
-    assertEquals("member-id", member.getId());
-  }
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> memberService.suspendMember("423"));
+        assertEquals("Member already suspended",exception.getMessage());
+    }
 
-  @AfterEach
-  public void tearDown(){
-    verifyNoMoreInteractions(memberRepository);
-  }
+    @Test
+    @DisplayName("Member Successfully Suspended Test")
+    void memberSuccessfullySuspendedTest(){
+        Member member = new Member();
+        member.setSuspended(false);
+
+        when(memberRepository.getMember("423")).thenReturn(member);
+        memberService.suspendMember("423");
+
+        assertTrue(member.isSuspended());
+
+        verify(memberRepository, times(1)).getMember("423");
+    }
+
+    @Test
+    @DisplayName("Created Member Successfully")
+    void memberSuccessfullyCreatedTest(){
+        String memberId = "J89284N8JK";
+        String memberName = "Jovian Ng";
+        String email = "jovian.ng@gdn-commerce.com";
+
+        Member member = Member.builder().id(memberId).name(memberName).email(email).suspended(false).build();
+
+        assertFalse(member.isSuspended());
+        assertEquals(memberId, member.getId());
+        assertEquals(memberName, member.getName());
+        assertEquals(email, member.getEmail());
+    }
 }
